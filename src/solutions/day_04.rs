@@ -2,6 +2,11 @@ use axum::{http::StatusCode, response::IntoResponse, Json};
 use serde::Deserialize;
 use serde_json::json;
 
+#[derive(Deserialize)]
+pub struct BareAttributeReindeer {
+    strength: i32,
+}
+
 //shuttle.rs-cch23-04-task_1
 pub async fn calculate_reindeer_strength(
     Json(body): Json<Vec<BareAttributeReindeer>>,
@@ -16,12 +21,19 @@ pub async fn calculate_reindeer_strength(
 }
 
 #[derive(Deserialize)]
-pub struct BareAttributeReindeer {
+pub struct FullAttributeReindeer {
     name: String,
-    strength: i32,
+    strength: u32,
+    speed: f32,
+    height: u32,
+    antler_width: u32,
+    snow_magic_power: u32,
+    favorite_food: String,
+    #[serde(alias = "cAnD13s_3ATeN-yesT3rdAy")]
+    candies_eaten_yesterday: u32,
 }
 
-//shuttle.rs-cch23-04-bonus_task
+//shuttle.rs-cch23-04-task_2(bonus_task)
 pub async fn reindeer_contest(
     Json(body): Json<Vec<FullAttributeReindeer>>,
 ) -> Result<impl IntoResponse, StatusCode> {
@@ -78,17 +90,4 @@ pub async fn reindeer_contest(
         "magician": archmage_msg,
         "consumer": foodie_msg,
     })));
-}
-
-#[derive(Deserialize)]
-pub struct FullAttributeReindeer {
-    name: String,
-    strength: u32,
-    speed: f32,
-    height: u32,
-    antler_width: u32,
-    snow_magic_power: u32,
-    favorite_food: String,
-    #[serde(alias = "cAnD13s_3ATeN-yesT3rdAy")]
-    candies_eaten_yesterday: u32,
 }
