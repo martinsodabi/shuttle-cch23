@@ -9,7 +9,7 @@ pub async fn calculate_reindeer_strength(
     let reindeers_strength = body
         .iter()
         .map(|reindeer| reindeer.strength)
-        .reduce(|acc, e| acc + e)
+        .reduce(|acc, e| acc + e) //Can also use sum()
         .unwrap();
 
     return Ok(reindeers_strength.to_string());
@@ -29,37 +29,28 @@ pub async fn reindeer_contest(
         return Err(StatusCode::BAD_REQUEST);
     }
 
-    let fastest_reindeer = body
-        .iter()
-        .reduce(|acc, e| if e.speed > acc.speed { e } else { acc })
-        .unwrap();
+    let mut fastest_reindeer = &body[0];
+    let mut tallest_reindeer = &body[0];
+    let mut archmage_reindeer = &body[0];
+    let mut foodie_reindeer = &body[0];
 
-    let tallest_reindeer = body
-        .iter()
-        .reduce(|acc, e| if e.height > acc.height { e } else { acc })
-        .unwrap();
+    for reindeer in &body {
+        if reindeer.speed > fastest_reindeer.speed {
+            fastest_reindeer = reindeer
+        }
 
-    let archmage_reindeer = body
-        .iter()
-        .reduce(|acc, e| {
-            if e.snow_magic_power > acc.snow_magic_power {
-                e
-            } else {
-                acc
-            }
-        })
-        .unwrap();
+        if reindeer.height > tallest_reindeer.height {
+            tallest_reindeer = reindeer;
+        }
 
-    let foodie_reindeer = body
-        .iter()
-        .reduce(|acc, e| {
-            if e.candies_eaten_yesterday > acc.candies_eaten_yesterday {
-                e
-            } else {
-                acc
-            }
-        })
-        .unwrap();
+        if reindeer.snow_magic_power > archmage_reindeer.snow_magic_power {
+            archmage_reindeer = reindeer;
+        }
+
+        if reindeer.candies_eaten_yesterday > foodie_reindeer.candies_eaten_yesterday {
+            foodie_reindeer = reindeer;
+        }
+    }
 
     let fastest_msg = format!(
         "Speeding past the finish line with a strength of {} is {}",
