@@ -74,11 +74,8 @@ pub async fn bake_cookie(headers: HeaderMap) -> Result<impl IntoResponse, Status
 
     let mut flour_ration: u32 = 0;
 
-    if pantry.contains_key("flour") && recipe.contains_key("flour") {
-        if recipe.get("flour").unwrap() > &0u32 {
-            flour_ration =
-                pantry.get("flour").unwrap_or(&0u32) / recipe.get("flour").unwrap_or(&0u32);
-        }
+    if recipe.get("flour").unwrap_or(&0u32) > &0u32 {
+        flour_ration = pantry.get("flour").unwrap_or(&0u32) / recipe.get("flour").unwrap_or(&0u32);
     }
 
     let mut remaining_ingredients = HashMap::new();
