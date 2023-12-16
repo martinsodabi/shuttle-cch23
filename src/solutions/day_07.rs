@@ -1,6 +1,5 @@
 use axum::{
     http::{HeaderMap, StatusCode},
-    response::IntoResponse,
     Json,
 };
 use base64::{engine::general_purpose, Engine as _};
@@ -9,7 +8,7 @@ use std::{collections::HashMap, str};
 
 //shuttle.rs-cch23-07-task_1
 // #[debug_handler] //Can't use debug_handler when HeaderMap is argument
-pub async fn decode_cookie_recipe(headers: HeaderMap) -> Result<impl IntoResponse, StatusCode> {
+pub async fn decode_cookie_recipe(headers: HeaderMap) -> Result<String, StatusCode> {
     let encoded_recipe: String = headers
         .get("Cookie")
         .unwrap()
@@ -36,18 +35,20 @@ pub async fn decode_cookie_recipe(headers: HeaderMap) -> Result<impl IntoRespons
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct RecipeAndPantry {
-    recipe: HashMap<String, u32>,
-    pantry: HashMap<String, u32>,
+    recipe: HashMap<String, i32>,
+    pantry: HashMap<String, i32>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct NumOfCookiesAndRemainingIngredients {
-    cookies: u32,
-    pantry: HashMap<String, u32>,
+    cookies: i32,
+    pantry: HashMap<String, i32>,
 }
 
 //shuttle.rs-cch23-07-task_2_and_3(bonus_tasks)
-pub async fn bake_cookie(headers: HeaderMap) -> Result<impl IntoResponse, StatusCode> {
+pub async fn bake_cookie(
+    headers: HeaderMap,
+) -> Result<Json<NumOfCookiesAndRemainingIngredients>, StatusCode> {
     let encoded_recipe: String = headers
         .get("Cookie")
         .unwrap()
@@ -72,23 +73,37 @@ pub async fn bake_cookie(headers: HeaderMap) -> Result<impl IntoResponse, Status
     let recipe = recipe_and_pantry.recipe;
     let pantry = recipe_and_pantry.pantry;
 
-    let mut flour_ration: u32 = 0;
+    // println!("Recipe {:#?}", recipe);
+    // println!("Pantry {:#?}", pantry);
 
-    if recipe.get("flour").unwrap_or(&0u32) > &0u32 {
-        flour_ration = pantry.get("flour").unwrap_or(&0u32) / recipe.get("flour").unwrap_or(&0u32);
-    }
+    let num_of_cookies: i32 = recipe
+        .iter()
+        .map(|(k, &v)| {
+            if v == 0 {
+                i32::MAX
+            } else {
+                pantry.get(k).map(|&p_v| p_v / v).unwrap_or_default()
+            }
+        })
+        .min()
+        .unwrap_or_default();
 
-    let mut remaining_ingredients = HashMap::new();
-
-    for ingredient in pantry {
-        let value = ingredient.1 - recipe.get(&ingredient.0).unwrap_or(&0u32) * flour_ration;
-        remaining_ingredients.insert(ingredient.0, value);
-    }
+    let remaining_ingredients: HashMap<String, i32> = pantry
+        .iter()
+        .map(|(k, &v)| {
+            (
+                k.to_owned(),
+                v - (recipe.get(k).unwrap_or(&0) * num_of_cookies),
+            )
+        })
+        .collect();
 
     let response_output = NumOfCookiesAndRemainingIngredients {
-        cookies: flour_ration,
+        cookies: num_of_cookies,
         pantry: remaining_ingredients,
     };
+
+    // println!("{:#?}", response_output);
 
     return Ok(Json(response_output));
 }
