@@ -1,6 +1,6 @@
-use axum::{http::StatusCode, response::IntoResponse, Json};
+use axum::{http::StatusCode, Json};
 use serde::Deserialize;
-use serde_json::json;
+use serde_json::{json, Value};
 
 #[derive(Deserialize)]
 pub struct BareAttributeReindeer {
@@ -10,7 +10,7 @@ pub struct BareAttributeReindeer {
 //shuttle.rs-cch23-04-task_1
 pub async fn calculate_reindeer_strength(
     Json(body): Json<Vec<BareAttributeReindeer>>,
-) -> Result<impl IntoResponse, StatusCode> {
+) -> Result<String, StatusCode> {
     let reindeers_strength = body
         .iter()
         .map(|reindeer| reindeer.strength)
@@ -36,7 +36,7 @@ pub struct FullAttributeReindeer {
 //shuttle.rs-cch23-04-task_2(bonus_task)
 pub async fn reindeer_contest(
     Json(body): Json<Vec<FullAttributeReindeer>>,
-) -> Result<impl IntoResponse, StatusCode> {
+) -> Result<Json<Value>, StatusCode> {
     if body.is_empty() {
         return Err(StatusCode::BAD_REQUEST);
     }

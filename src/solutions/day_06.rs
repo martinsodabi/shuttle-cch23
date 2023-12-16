@@ -1,8 +1,8 @@
-use axum::{http::StatusCode, response::IntoResponse, Json};
-use serde_json::json;
+use axum::{http::StatusCode, Json};
+use serde_json::{json, Value};
 
 //shuttle.rs-cch23-06-task_1_and_bonus_task
-pub async fn get_elf_count(body: String) -> Result<impl IntoResponse, StatusCode> {
+pub async fn get_elf_count(body: String) -> Result<Json<Value>, StatusCode> {
     let elf_count: u32 = body
         .split(" ")
         .fold(0, |acc, e| if e.contains("elf") { acc + 1 } else { acc });

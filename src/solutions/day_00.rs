@@ -1,4 +1,4 @@
-use axum::{http::StatusCode, response::IntoResponse};
+use axum::http::StatusCode;
 
 //shuttle.rs-cch23--1
 pub async fn hello_world() -> &'static str {
@@ -6,6 +6,6 @@ pub async fn hello_world() -> &'static str {
 }
 
 //shuttle.rs-cch23--1
-pub async fn return_500() -> impl IntoResponse {
+pub async fn return_500() -> StatusCode {
     return StatusCode::INTERNAL_SERVER_ERROR;
 }

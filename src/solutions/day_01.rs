@@ -1,9 +1,7 @@
 use axum::{extract::Path, http::StatusCode, response::IntoResponse};
 
 //shuttle.rs-cch23-01-task_1_and_bonus_task
-pub async fn recalibrate_packet_ids(
-    Path(packets): Path<String>,
-) -> Result<impl IntoResponse, StatusCode> {
+pub async fn recalibrate_packet_ids(Path(packets): Path<String>) -> Result<String, StatusCode> {
     let packet_vec: Vec<&str> = packets.split("/").collect();
 
     if packet_vec.len() > 20 {
